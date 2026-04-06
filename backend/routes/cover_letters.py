@@ -20,7 +20,7 @@ def generate_cover_letter(data: dict):
     resume_id = data.get("resume_id")
     user_id = data.get("user_id")
 
-    resume = supbase.table("resumes").select("*").eq("id", resume_id).execute()
+    resume = supabase.table("resumes").select("*").eq("id", resume_id).execute()
     if not resume.data:
         return { "error": "Resume not found" }
 
@@ -46,7 +46,7 @@ def generate_cover_letter(data: dict):
 
     content = response.choices[0].message.content or ""
 
-    result = supbase.table("cover_letters").insert({
+    result = supabase.table("cover_letters").insert({
         "user_id": user_id,
         "resume_id": resume_id,
         "content": content
