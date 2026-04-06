@@ -2,14 +2,14 @@ import type { Route } from "./+types/home";
 import Navbar from "~/components/Navbar";
 import ResumeCard from "~/components/ResumeCard";
 import { Link, useNavigate } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "~/lib/useAuth";
 import { API_BASE } from "~/lib/api";
 
 export function meta({ }: Route.MetaArgs) {
   return [
-    { title: "Calibr" },
-    { name: "description", content: "Smart feedback for your dream job!" },
+    { title: "Calibr | Dashboard" },
+    { name: "description", content: "Track your resume scores and AI feedback" },
   ];
 }
 
@@ -19,7 +19,6 @@ export default function Home() {
   const [resumes, setResumes] = useState<any[]>([])
   const [loadingResumes, setLoadingResumes] = useState(false)
 
-  // ALL hooks first, then effects
   useEffect(() => {
     if (!loading && !user) navigate('/auth')
   }, [user, loading])
@@ -44,7 +43,16 @@ export default function Home() {
     loadResumes()
   }, [user])
 
-  // Early returns AFTER all hooks
+  const stats = useMemo(() => {
+    if (!resumes.length) return null
+    const scores = resumes.map(r => r.score || 0)
+    return {
+      total: resumes.length,
+      avgScore: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
+      bestScore: Math.max(...scores),
+    }
+  }, [resumes])
+
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen">
       <p>Loading...</p>
@@ -57,7 +65,7 @@ export default function Home() {
     <main className="bg-[url('/images/bg-main.svg')] bg-cover">
       <Navbar />
       <section className="main-section">
-        <div className="page-heading py-16">
+        <div className="page-heading py-8 md:py-16">
           <h1>Track Your Applications & Resume Ratings</h1>
           {!loadingResumes && resumes?.length === 0 ? (
             <h2>No resumes found. Upload your first resume to get feedback.</h2>
@@ -65,9 +73,38 @@ export default function Home() {
             <h2>Review your submissions and check AI-powered feedback.</h2>
           )}
         </div>
+
+        {/* Stats bar */}
+        {stats && !loadingResumes && (
+          <div className="flex flex-wrap justify-center gap-6 md:gap-12 w-full max-w-2xl bg-white/80 backdrop-blur-sm rounded-2xl p-5 md:p-6 shadow-sm">
+            {[
+              { value: stats.total, label: "Resumes" },
+              { value: stats.avgScore, label: "Avg Score" },
+              { value: stats.bestScore, label: "Best Score" },
+            ].map((stat) => (
+              <div key={stat.label} className="flex flex-col items-center gap-1">
+                <p className="text-2xl md:text-3xl font-bold text-gradient">{stat.value}</p>
+                <p className="text-xs md:text-sm text-gray-400">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Quick actions */}
+        {!loadingResumes && resumes.length > 0 && (
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <Link to="/upload" className="primary-button w-fit text-sm font-semibold px-6">
+              Upload New Resume
+            </Link>
+            <Link to="/cover-letters" className="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors px-4 py-2">
+              View Cover Letters →
+            </Link>
+          </div>
+        )}
+
         {loadingResumes && (
           <div className="flex flex-col items-center justify-center">
-            <img src="/images/resume-scan-2.gif" className="w-[200px]" />
+            <img src="/images/resume-scan-2.gif" className="w-[150px] md:w-[200px]" />
           </div>
         )}
         {!loadingResumes && resumes.length > 0 && (
@@ -78,8 +115,8 @@ export default function Home() {
           </div>
         )}
         {!loadingResumes && resumes?.length === 0 && (
-          <div className="flex flex-col items-center justify-center mt-10 gap-4">
-            <Link to="/upload" className="primary-button w-fit text-xl font-semibold">
+          <div className="flex flex-col items-center justify-center mt-6 md:mt-10 gap-4">
+            <Link to="/upload" className="primary-button w-fit text-lg md:text-xl font-semibold px-8">
               Upload Resume
             </Link>
           </div>

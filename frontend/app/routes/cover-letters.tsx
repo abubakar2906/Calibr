@@ -61,7 +61,7 @@ const CoverLetters = () => {
                         <p className="text-gray-500">No cover letters yet. Generate one from a resume.</p>
                         <button
                             className="primary-button w-fit"
-                            onClick={() => navigate('/')}
+                            onClick={() => navigate('/dashboard')}
                         >
                             Go to Resumes
                         </button>

@@ -19,7 +19,7 @@ const Auth = () => {
     const [message, setMessage] = useState('')
 
     useEffect(() => {
-        if (!loading && user) navigate('/')
+        if (!loading && user) navigate('/dashboard')
     }, [user, loading])
 
     const handleEmailAuth = async (e: React.FormEvent) => {
@@ -49,7 +49,7 @@ const Auth = () => {
             if (error) {
                 setError(error.message)
             } else {
-                navigate('/')
+                navigate('/dashboard')
             }
         }
 
