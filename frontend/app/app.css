@@ -51,6 +51,8 @@ form {
 
 input {
   @apply w-full p-4 inset-shadow rounded-2xl focus:outline-none bg-white min-h-[56px];
+  box-sizing: border-box;
+  display: block;
 }
 
 @layer components {
